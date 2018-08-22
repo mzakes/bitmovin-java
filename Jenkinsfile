@@ -31,8 +31,8 @@ pipeline {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
                sh 'docker push trialdaybitadmin/test-image:$version'
+               }
+            }
         }
-      }
     }
-
 }
