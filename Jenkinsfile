@@ -21,7 +21,7 @@ pipeline {
             } 
             steps {
                 echo "${artifactVersion}"
-                sh 'mvn -B -DskipTests -Drevision=${artifactVersion} clean package'
+                sh 'mvn -B clean package -DskipTests -Drevision=${artifactVersion}'
             }
             
         }
