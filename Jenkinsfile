@@ -20,6 +20,7 @@ pipeline {
               }
             } 
             steps {
+                echo "{ARTIFACT_VERSION}"
                 sh 'mvn -B -DskipTests -Drevision="${ARTIFACT_VERSION}" clean package'
             }
             
