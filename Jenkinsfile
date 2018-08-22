@@ -7,11 +7,15 @@ pipeline {
         }
     }
     stages {
+        stage('Prepare') {
+	  agent any
+          script {
+             ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
+          }
+
+        }
         stage('Build') { 
             steps {
-              script {
-                ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
-              }
                 sh 'mvn -B -DskipTests -Drevision=$ARTIFACT_VERSION clean package'
             }
             
