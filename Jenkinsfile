@@ -11,7 +11,7 @@ pipeline {
              script {
                   def artifactVersion= sh(returnStdout: true, script: 'git describe').trim()
                   env.ARTIFACT_VERSION = artifactVersion
-                  echo ${env.ARTIFACT_VERSION}
+                  echo "${env.ARTIFACT_VERSION}"
              }
           }
 
