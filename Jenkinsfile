@@ -1,5 +1,4 @@
 pipeline {
-    String ARTIFACT_VERSION
     agent none 
     stages {
         stage('Checkout') {
