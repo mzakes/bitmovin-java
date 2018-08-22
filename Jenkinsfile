@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                version=$(git describe)
+                version=sh 'git describe'
                 sh 'mvn -B -DskipTests -Drevision=$version clean package'
             }
             
