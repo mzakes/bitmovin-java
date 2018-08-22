@@ -1,3 +1,4 @@
+def version
 pipeline {
     agent {
         docker {
@@ -8,20 +9,30 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                sh 'mvn -B -DskipTests clean package' 
+                version=$(git describe)
+                sh 'mvn -B -DskipTests -Drevision=$version clean package'
             }
+            
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-	
+                sh 'mvn test -Drevision=$version'
+            }	
         }
+	stage('Docker build') {
+            agent any
+            steps {
+                sh 'docker build -t trialdaybitadmin/test-image:$version --build-arg JAR_FILE=target/*.jar'
+	    }
+        }
+        stage('Docker Push') {
+            agent any
+            steps {
+               withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
+               sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
+               sh 'docker push trialdaybitadmin/test-image:$version'
+        }
+      }
     }
 
 }
