@@ -39,8 +39,7 @@ pipeline {
 	stage('Docker build') {
             agent any
             steps {
-                
-                sh "docker build -t trialdaybitadmin/test-image:${artifactVersion} --build-arg JAR_FILE=target/bitmovin-java-${artifactVersion}.jar"
+                sh "docker build -t trialdaybitadmin/test-image:${artifactVersion} --build-arg JAR_FILE=target/bitmovin-java-${artifactVersion}.jar ."
 	    }
         }
         stage('Docker Push') {
