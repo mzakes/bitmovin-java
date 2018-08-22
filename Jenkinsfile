@@ -1,4 +1,7 @@
 pipeline {
+    environment {
+      ARTIFACT_VERSION = ''
+    }
     agent none 
     stages {
         stage('Checkout') {
@@ -6,8 +9,7 @@ pipeline {
           steps {
              checkout scm
              script {
-                 ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
-                 echo "${ARTIFACT_VERSION}"
+                 env.ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
              }
           }
 
@@ -20,8 +22,8 @@ pipeline {
               }
             } 
             steps {
-                echo "{ARTIFACT_VERSION}"
-                sh 'mvn -B -DskipTests -Drevision="${ARTIFACT_VERSION}" clean package'
+                echo "{env.ARTIFACT_VERSION}"
+                sh 'mvn -B -DskipTests -Drevision="${env.ARTIFACT_VERSION}" clean package'
             }
             
         }
@@ -33,13 +35,13 @@ pipeline {
               }
             }
             steps {
-                sh 'mvn test -Drevision="${ARTIFACT_VERSION}"'
+                sh 'mvn test -Drevision="${env.ARTIFACT_VERSION}"'
             }	
         }
 	stage('Docker build') {
             agent any
             steps {
-                sh 'docker build -t trialdaybitadmin/test-image:"${ARTIFACT_VERSION}" --build-arg JAR_FILE=target/*.jar'
+                sh 'docker build -t trialdaybitadmin/test-image:"${env.ARTIFACT_VERSION}" --build-arg JAR_FILE=target/*.jar'
 	    }
         }
         stage('Docker Push') {
@@ -47,7 +49,7 @@ pipeline {
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
-               sh 'docker push trialdaybitadmin/test-image:"${ARTIFACT_VERSION}"'
+               sh 'docker push trialdaybitadmin/test-image:"${env.ARTIFACT_VERSION}"'
                }
             }
         }
