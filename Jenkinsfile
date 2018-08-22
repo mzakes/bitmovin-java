@@ -39,7 +39,7 @@ pipeline {
 	stage('Docker build') {
             agent any
             steps {
-                sh "docker build -t trialdaybitadmin/test-image:${artifactVersion} --build-arg JAR_FILE=target/bitmovin-java-${artifactVersion}.jar ."
+                sh "docker build -t trialdaybitadmin/bitmovin-java:${artifactVersion} --build-arg JAR_FILE=target/bitmovin-java-${artifactVersion}.jar ."
 	    }
         }
         stage('Docker Push') {
@@ -47,7 +47,7 @@ pipeline {
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
-               sh "docker push trialdaybitadmin/test-image:${artifactVersion}"
+               sh "docker push trialdaybitadmin/bitmovin-java:${artifactVersion}"
                }
             }
         }
