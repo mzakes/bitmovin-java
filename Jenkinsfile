@@ -3,6 +3,7 @@ pipeline {
     agent none 
     stages {
         stage('Checkout') {
+          agent any
           steps {
              checkout scm
              script {
@@ -35,11 +36,13 @@ pipeline {
             }	
         }
 	stage('Docker build') {
+            agent any
             steps {
                 sh 'docker build -t trialdaybitadmin/test-image:$ARTIFACT_VERSION --build-arg JAR_FILE=target/*.jar'
 	    }
         }
         stage('Docker Push') {
+            agent any
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
