@@ -7,7 +7,7 @@ pipeline {
              checkout scm
              script {
                  ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
-                 echo "$ARTIFACT_VERSION"
+                 echo "${ARTIFACT_VERSION}"
              }
           }
 
@@ -20,7 +20,7 @@ pipeline {
               }
             } 
             steps {
-                sh 'mvn -B -DskipTests -Drevision="$ARTIFACT_VERSION" clean package'
+                sh 'mvn -B -DskipTests -Drevision="${ARTIFACT_VERSION}" clean package'
             }
             
         }
@@ -32,13 +32,13 @@ pipeline {
               }
             }
             steps {
-                sh 'mvn test -Drevision="$ARTIFACT_VERSION"'
+                sh 'mvn test -Drevision="${ARTIFACT_VERSION}"'
             }	
         }
 	stage('Docker build') {
             agent any
             steps {
-                sh 'docker build -t trialdaybitadmin/test-image:"$ARTIFACT_VERSION" --build-arg JAR_FILE=target/*.jar'
+                sh 'docker build -t trialdaybitadmin/test-image:"${ARTIFACT_VERSION}" --build-arg JAR_FILE=target/*.jar'
 	    }
         }
         stage('Docker Push') {
@@ -46,7 +46,7 @@ pipeline {
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
-               sh 'docker push trialdaybitadmin/test-image:"$ARTIFACT_VERSION"'
+               sh 'docker push trialdaybitadmin/test-image:"${ARTIFACT_VERSION}"'
                }
             }
         }
