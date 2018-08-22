@@ -23,6 +23,7 @@
     </developers>
     <properties>
 	<revision>1.34.0-SNAPSHOT</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <licenses>
         <license>
