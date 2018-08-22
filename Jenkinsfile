@@ -9,8 +9,10 @@ pipeline {
     stages {
         stage('Prepare') {
 	  agent any
-          script {
-             ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
+          steps {
+             script {
+                 ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
+             }
           }
 
         }
