@@ -7,7 +7,8 @@ pipeline {
           steps {
              checkout scm
              script {
-                 ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe --tags').trim()
+                 ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
+                 echo $ARTIFACT_VERSION
              }
           }
 
