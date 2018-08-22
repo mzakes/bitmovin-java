@@ -1,7 +1,5 @@
+def artifactVersion
 pipeline {
-    environment {
-      ARTIFACT_VERSION = ''
-    }
     agent none 
     stages {
         stage('Checkout') {
@@ -9,9 +7,7 @@ pipeline {
           steps {
              checkout scm
              script {
-                  def artifactVersion= sh(returnStdout: true, script: 'git describe').trim()
-                  env.ARTIFACT_VERSION = artifactVersion
-                  echo "${env.ARTIFACT_VERSION}"
+                  artifactVersion = sh(returnStdout: true, script: 'git describe').trim()
              }
           }
 
@@ -24,8 +20,8 @@ pipeline {
               }
             } 
             steps {
-                echo "{env.ARTIFACT_VERSION}"
-                sh 'mvn -B -DskipTests -Drevision="${env.ARTIFACT_VERSION}" clean package'
+                echo "${artifactVersion}"
+                sh 'mvn -B -DskipTests -Drevision="${artifactVersion}" clean package'
             }
             
         }
@@ -37,13 +33,13 @@ pipeline {
               }
             }
             steps {
-                sh 'mvn test -Drevision="${env.ARTIFACT_VERSION}"'
+                sh 'mvn test -Drevision="${artifactVersion}"'
             }	
         }
 	stage('Docker build') {
             agent any
             steps {
-                sh 'docker build -t trialdaybitadmin/test-image:"${env.ARTIFACT_VERSION}" --build-arg JAR_FILE=target/*.jar'
+                sh 'docker build -t trialdaybitadmin/test-image:"${artifactVersion}" --build-arg JAR_FILE=target/*.jar'
 	    }
         }
         stage('Docker Push') {
@@ -51,7 +47,7 @@ pipeline {
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
-               sh 'docker push trialdaybitadmin/test-image:"${env.ARTIFACT_VERSION}"'
+               sh 'docker push trialdaybitadmin/test-image:"${artifactVersion}"'
                }
             }
         }
