@@ -7,11 +7,12 @@ pipeline {
         }
     }
     stages {
-        stage('Prepare') {
+        stage('Checkout') {
 	  agent any
           steps {
+             checkout scm
              script {
-                 ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
+                 ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe --tags').trim()
              }
           }
 
