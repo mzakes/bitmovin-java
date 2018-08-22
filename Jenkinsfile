@@ -21,7 +21,7 @@ pipeline {
             } 
             steps {
                 echo "${artifactVersion}"
-                mvn -B clean package -DskipTests -Drevision=${artifactVersion}
+                sh 'mvn -B clean package -DskipTests -Drevision=${artifactVersion}'
             }
             
         }
@@ -33,7 +33,7 @@ pipeline {
               }
             }
             steps {
-                mvn test -Drevision=${artifactVersion}
+                sh 'mvn test -Drevision=${artifactVersion}'
             }	
         }
 	stage('Docker build') {
