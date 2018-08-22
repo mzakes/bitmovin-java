@@ -1,4 +1,4 @@
-def version
+def ARTIFACT_VERSION
 pipeline {
     agent {
         docker {
@@ -9,20 +9,22 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                version=sh 'git describe'
-                sh 'mvn -B -DskipTests -Drevision=$version clean package'
+              script {
+                ARTIFACT_VERSION = sh(returnStdout: true, script: 'git describe').trim()
+              }
+                sh 'mvn -B -DskipTests -Drevision=$ARTIFACT_VERSION clean package'
             }
             
         }
         stage('Test') {
             steps {
-                sh 'mvn test -Drevision=$version'
+                sh 'mvn test -Drevision=$ARTIFACT_VERSION'
             }	
         }
 	stage('Docker build') {
             agent any
             steps {
-                sh 'docker build -t trialdaybitadmin/test-image:$version --build-arg JAR_FILE=target/*.jar'
+                sh 'docker build -t trialdaybitadmin/test-image:$ARTIFACT_VERSION --build-arg JAR_FILE=target/*.jar'
 	    }
         }
         stage('Docker Push') {
@@ -30,7 +32,7 @@ pipeline {
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
                sh "docker login -u ${env.dockerUser} -p ${env.dockerPassword}"
-               sh 'docker push trialdaybitadmin/test-image:$version'
+               sh 'docker push trialdaybitadmin/test-image:$ARTIFACT_VERSION'
                }
             }
         }
